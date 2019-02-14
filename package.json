@@ -20,7 +20,8 @@
   },
   "homepage": "https://github.com/Nicklason/node-request-retry#readme",
   "dependencies": {
-    "retry": "^0.12.0"
+    "http-status": "^1.3.1",
+    "requestretry": "^3.1.0"
   },
   "devDependencies": {
     "eslint": "^5.13.0",
