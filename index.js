@@ -31,7 +31,7 @@ function retryStrategy (err, response, body) {
     } else if (response.statusCode === 429 && this.attempts >= 2) {
         // Ratelimited, will only retry once
         return errorHandler.call(this, err, response, body);
-    } else if (400 <= response.statusCode && response.statusCode <= 499) {
+    } else if (response.statusCode !== 429 && 400 <= response.statusCode && response.statusCode <= 499) {
         // Bad request, should not retry
         return errorHandler.call(this, err, response, body);
     } else if (this.attempts >= this.options.maxAttempts) {
