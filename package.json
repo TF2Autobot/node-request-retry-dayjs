@@ -1,0 +1,29 @@
+{
+  "name": "@nicklason/request-retry",
+  "version": "1.0.0",
+  "description": "Retry requests on common errors",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint ./"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nicklason/node-request-retry.git"
+  },
+  "author": {
+    "name": "Nicklas Marc Pedersen",
+    "url": "https://nicklas.io"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Nicklason/node-request-retry/issues"
+  },
+  "homepage": "https://github.com/Nicklason/node-request-retry#readme",
+  "dependencies": {
+    "retry": "^0.12.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.13.0",
+    "eslint-config-google": "^0.12.0"
+  }
+}
