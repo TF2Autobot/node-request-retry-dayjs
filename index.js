@@ -11,9 +11,9 @@ const request = require('requestretry').defaults({
 
 /**
  * A retry strategy let you specify when request-retry should retry a request
- * @param {Error|null} err 
- * @param {Object|undefined} response 
- * @param {String|Object|undefined} body 
+ * @param {Error|null} err
+ * @param {Object|undefined} response
+ * @param {String|Object|undefined} body
  * @return {Boolean} true if the request should be retried
  */
 function retryStrategy (err, response, body) {
@@ -59,9 +59,9 @@ function retryStrategy (err, response, body) {
 
 /**
  * A delay strategy let you specify how long request-retry should wait before trying again the request
- * @param {Error|null} err 
- * @param {Object|undefined} response 
- * @param {String|Object|undefined} body 
+ * @param {Error|null} err
+ * @param {Object|undefined} response
+ * @param {String|Object|undefined} body
  * @return {Number} Milliseconds to wait
  */
 function delayStrategy (err, response, body) {
@@ -71,9 +71,10 @@ function delayStrategy (err, response, body) {
 
 /**
  * Handles errors and replies to the caller
- * @param {Error|null} err 
- * @param {Object|undefined} response 
- * @param {String|Object|undefined} body 
+ * @param {Error|null} err
+ * @param {Object|undefined} response
+ * @param {String|Object|undefined} body
+ * @return {Boolean}
  */
 function errorHandler (err, response, body) {
     if (!err) {
