@@ -10,6 +10,14 @@ const request = require('requestretry').defaults({
 });
 
 function retryStrategy (err, response, body) {
+    if (err) {
+        if (err.message.startsWith('tunneling socket could not be established')) {
+            // Proxy failed
+            return errorHandler.call(this, err, response, body);
+        }
+        return this.attempts >= 2 ? errorHandler.call(this, err, response, body) : true;
+    }
+
     const networkError = request.RetryStrategies.NetworkError(err, response, body);
     if (networkError !== null) {
         // Retry as long as there is a network error, until the max attempts has been reached.
