@@ -9,6 +9,13 @@ const request = require('requestretry').defaults({
     delayStrategy: delayStrategy
 });
 
+/**
+ * A retry strategy let you specify when request-retry should retry a request
+ * @param {Error|null} err 
+ * @param {Object|undefined} response 
+ * @param {String|Object|undefined} body 
+ * @return {Boolean} true if the request should be retried
+ */
 function retryStrategy (err, response, body) {
     if (err) {
         if (err.message.startsWith('tunneling socket could not be established')) {
@@ -50,17 +57,30 @@ function retryStrategy (err, response, body) {
     return true;
 }
 
+/**
+ * A delay strategy let you specify how long request-retry should wait before trying again the request
+ * @param {Error|null} err 
+ * @param {Object|undefined} response 
+ * @param {String|Object|undefined} body 
+ * @return {Number} Milliseconds to wait
+ */
 function delayStrategy (err, response, body) {
     // TODO: Check for retry headers
     return this.options.retryDelay;
 }
 
+/**
+ * Handles errors and replies to the caller
+ * @param {Error|null} err 
+ * @param {Object|undefined} response 
+ * @param {String|Object|undefined} body 
+ */
 function errorHandler (err, response, body) {
     if (!err) {
         if (response) {
             err = new Error(status[response.statusCode]);
         } else {
-            err = new Error('Too many attempts');
+            err = new Error('Too many failed attempts');
         }
     }
 
