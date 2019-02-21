@@ -1,6 +1,6 @@
 {
   "name": "@nicklason/request-retry",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Retry requests on common errors",
   "main": "index.js",
   "scripts": {
