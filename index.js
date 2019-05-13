@@ -1,6 +1,7 @@
 'use strict';
 
 const status = require('http-status');
+const moment = require('moment');
 
 const request = require('requestretry').defaults({
     timeout: 3000,
@@ -40,6 +41,9 @@ function retryStrategy (err, response, body) {
     if (200 <= response.statusCode && response.statusCode <= 399) {
         // Successful response
         return false;
+    } else if (response.statusCode == 500 && this.options.method !== 'GET') {
+        // Only allow retrying when using GET
+        return errorHandler.call(this, err, response, body);
     } else if (500 <= response.statusCode && response.statusCode <= 599 && this.attempts >= 2) {
         // Internal server error, should only try two times
         return errorHandler.call(this, err, response, body);
@@ -65,8 +69,46 @@ function retryStrategy (err, response, body) {
  * @return {Number} Milliseconds to wait
  */
 function delayStrategy (err, response, body) {
-    // TODO: Check for retry headers
-    return this.options.retryDelay;
+    if (response.statusCode !== 429) {
+        return this.options.retryDelay;
+    }
+
+    const retryAfter = response.headers['Retry-After'] || response.headers['retry-after'];
+    if (retryAfter === undefined) {
+        return this.options.retryDelay;
+    }
+
+    let wait;
+
+    if (/^\d+$/.test(retryAfter)) {
+        // Retry in seconds
+        wait = parseInt(retryAfter) * 1000;
+    } else {
+        const date = moment(retryAfter, 'ddd, DD MMM YYYY HH:mm:ss Z');
+
+        if (date.isInvalid()) {
+            // Unknown value for the retry after header, using default retry delay
+            return this.options.retryDelay;
+        } else {
+            // Retry using date
+            wait = date.diff(moment(), 'milliseconds');
+        }
+    }
+
+    this.wait = wait;
+
+    if (wait <= this.options.retryAfter) {
+        // We will only try to wait, if we allow a wait that big (defalt is 5 seconds)
+        return wait;
+    }
+
+    // Right after returning the retry delay, clear the new timeout, and call the error handler
+    process.nextTick(function () {
+        clearTimeout(this._timeout);
+        return errorHandler.call(this, err, response, body);
+    }.bind(this));
+
+    return wait;
 }
 
 /**
@@ -93,6 +135,9 @@ function errorHandler (err, response, body) {
     }
 
     err.attempts = this.attempts;
+    if (this.wait !== undefined) {
+        err.retryAfter = this.wait;
+    }
 
     // Reply with either callback or promise (function from requestretry)
     this.reply(err, response, body);
