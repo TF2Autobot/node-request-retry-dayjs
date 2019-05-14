@@ -69,7 +69,7 @@ function retryStrategy (err, response, body) {
  * @return {Number} Milliseconds to wait
  */
 function delayStrategy (err, response, body) {
-    if (response.statusCode !== 429) {
+    if (!response || response.statusCode !== 429) {
         return this.options.retryDelay;
     }
 
