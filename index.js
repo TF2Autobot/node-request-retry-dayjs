@@ -4,8 +4,8 @@ const status = require('http-status');
 const moment = require('moment');
 
 const request = require('requestretry').defaults({
-    timeout: 3000,
-    maxAttempts: 3,
+    timeout: 10000,
+    maxAttempts: 5 + 1, // retry the request 5 times
     retryStrategy: retryStrategy,
     delayStrategy: delayStrategy
 });
@@ -23,7 +23,7 @@ function retryStrategy (err, response, body) {
             // Proxy failed
             return errorHandler.call(this, err, response, body);
         }
-        return this.attempts >= 2 ? errorHandler.call(this, err, response, body) : true;
+        return this.attempts >= this.options.maxAttempts ? errorHandler.call(this, err, response, body) : true;
     }
 
     const networkError = request.RetryStrategies.NetworkError(err, response, body);
@@ -44,12 +44,6 @@ function retryStrategy (err, response, body) {
     } else if (response.statusCode == 500 && this.options.method !== 'GET') {
         // Only allow retrying when using GET
         return errorHandler.call(this, err, response, body);
-    } else if (500 <= response.statusCode && response.statusCode <= 599 && this.attempts >= 2) {
-        // Internal server error, should only try two times
-        return errorHandler.call(this, err, response, body);
-    } else if (response.statusCode === 429 && this.attempts >= 2) {
-        // Ratelimited, will only retry once
-        return errorHandler.call(this, err, response, body);
     } else if (response.statusCode !== 429 && 400 <= response.statusCode && response.statusCode <= 499) {
         // Bad request, should not retry
         return errorHandler.call(this, err, response, body);
@@ -69,13 +63,14 @@ function retryStrategy (err, response, body) {
  * @return {Number} Milliseconds to wait
  */
 function delayStrategy (err, response, body) {
+    delete this.retryAfter;
     if (!response || response.statusCode !== 429) {
-        return this.options.retryDelay;
+        return exponentialBackoff(this.attempts);
     }
 
     const retryAfter = response.headers['Retry-After'] || response.headers['retry-after'];
     if (retryAfter === undefined) {
-        return this.options.retryDelay;
+        return exponentialBackoff(this.attempts);
     }
 
     let wait;
@@ -88,27 +83,21 @@ function delayStrategy (err, response, body) {
 
         if (date.isInvalid()) {
             // Unknown value for the retry after header, using default retry delay
-            return this.options.retryDelay;
+            return exponentialBackoff(this.attempts);
         } else {
             // Retry using date
             wait = date.diff(moment(), 'milliseconds');
         }
     }
 
-    this.wait = wait;
-
-    if (wait <= this.options.retryAfter) {
-        // We will only try to wait, if we allow a wait that big (defalt is 5 seconds)
-        return wait;
-    }
-
-    // Right after returning the retry delay, clear the new timeout, and call the error handler
-    process.nextTick(function () {
-        clearTimeout(this._timeout);
-        return errorHandler.call(this, err, response, body);
-    }.bind(this));
+    // Set retry time for error
+    this.retryAfter = wait;
 
     return wait;
+}
+
+function exponentialBackoff (attempts) {
+    return (Math.pow(2, attempts - 1) * 1000) + Math.floor(Math.random() * 1000);
 }
 
 /**
@@ -127,16 +116,16 @@ function errorHandler (err, response, body) {
         }
     }
 
-    if (response) {
+    if (response !== undefined) {
         err.statusCode = response.statusCode;
     }
-    if (body) {
+    if (body !== undefined) {
         err.body = body;
     }
 
     err.attempts = this.attempts;
-    if (this.wait !== undefined) {
-        err.retryAfter = this.wait;
+    if (this.retryAfter !== undefined) {
+        err.retryAfter = this.retryAfter;
     }
 
     // Reply with either callback or promise (function from requestretry)
