@@ -24,8 +24,8 @@
     "access": "public"
   },
   "dependencies": {
+    "dayjs": "^1.9.6",
     "http-status": "^1.4.2",
-    "moment": "^2.24.0",
     "request": "^2.88.0",
     "requestretry": "^4.0.2"
   },
