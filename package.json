@@ -1,7 +1,7 @@
 {
-  "name": "@nicklason/request-retry",
-  "version": "1.1.2",
-  "description": "Retry requests on common errors",
+  "name": "request-retry-dayjs",
+  "version": "1.0.0",
+  "description": "Retry requests on common errors - Originally from @Nicklason/node-request-retry",
   "main": "index.js",
   "scripts": {
     "lint": "eslint ./",
@@ -9,17 +9,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Nicklason/node-request-retry.git"
+    "url": "git+https://github.com/idinium96/node-request-retry-dayjs.git"
   },
   "author": {
-    "name": "Nicklas Marc Pedersen",
+    "name": "Nicklas Marc Pedersen/IdiNium",
     "url": "https://nicklas.io"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Nicklason/node-request-retry/issues"
+    "url": "https://github.com/idinium96/node-request-retry-dayjs/issues"
   },
-  "homepage": "https://github.com/Nicklason/node-request-retry#readme",
+  "homepage": "https://github.com/idinium96/node-request-retry-dayjs#readme",
   "publishConfig": {
     "access": "public"
   },
