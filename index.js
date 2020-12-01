@@ -1,7 +1,7 @@
 'use strict';
 
 const status = require('http-status');
-const moment = require('moment');
+const dayjs = require('dayjs');
 
 const request = require('requestretry').defaults({
     timeout: 10000,
@@ -79,14 +79,14 @@ function delayStrategy (err, response, body) {
         // Retry in seconds
         wait = parseInt(retryAfter) * 1000;
     } else {
-        const date = moment(retryAfter, 'ddd, DD MMM YYYY HH:mm:ss Z');
+        const date = dayjs(retryAfter, 'ddd, DD MMM YYYY HH:mm:ss Z');
 
         if (date.isInvalid()) {
             // Unknown value for the retry after header, using default retry delay
             return exponentialBackoff(this.attempts);
         } else {
             // Retry using date
-            wait = date.diff(moment(), 'milliseconds');
+            wait = date.diff(dayjs(), 'millisecond');
         }
     }
 
