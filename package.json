@@ -1,6 +1,6 @@
 {
   "name": "request-retry-dayjs",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Retry requests on common errors - Originally from @Nicklason/node-request-retry",
   "main": "index.js",
   "scripts": {
