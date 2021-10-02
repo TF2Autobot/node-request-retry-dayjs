@@ -27,7 +27,7 @@
     "dayjs": "^1.10.7",
     "http-status": "^1.5.0",
     "request": "^2.88.2",
-    "requestretry": "^4.1.2"
+    "requestretry": "^6.0.0"
   },
   "devDependencies": {}
 }
