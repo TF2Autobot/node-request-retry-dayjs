@@ -27,6 +27,6 @@
     "dayjs": "^1.11.1",
     "http-status": "^1.5.1",
     "request": "^2.88.2",
-    "requestretry": "^7.0.2"
+    "requestretry": "^7.1.0"
   }
 }
