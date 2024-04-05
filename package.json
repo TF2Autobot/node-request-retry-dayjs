@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "dayjs": "^1.11.10",
-    "http-status": "^1.6.2",
+    "http-status": "^1.7.4",
     "request": "^2.88.2",
     "requestretry": "^7.1.0"
   }
